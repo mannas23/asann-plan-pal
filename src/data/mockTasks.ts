@@ -1,0 +1,67 @@
+import type { ExtractedTask } from "@/types/task";
+
+export const generateMockTasks = (): ExtractedTask[] => [
+  {
+    id: "1",
+    title: "Write Research Paper Introduction",
+    description: "Draft a 500-word introduction covering the thesis statement and background context for the climate change impact study.",
+    deadline: "Apr 10, 2026",
+    urgency: "high",
+    estimatedMinutes: 45,
+    started: false,
+    steps: [
+      "Review assignment rubric and grading criteria",
+      "Outline key points for the introduction",
+      "Write the hook and background paragraph",
+      "State the thesis clearly",
+      "Proofread and check word count",
+    ],
+  },
+  {
+    id: "2",
+    title: "Complete Literature Review",
+    description: "Find and summarize 5 peer-reviewed sources related to your research topic. Use APA format for citations.",
+    deadline: "Apr 12, 2026",
+    urgency: "medium",
+    estimatedMinutes: 90,
+    started: false,
+    steps: [
+      "Search academic databases for relevant papers",
+      "Read and annotate each source",
+      "Write a summary paragraph per source",
+      "Format all citations in APA style",
+      "Create a references page",
+    ],
+  },
+  {
+    id: "3",
+    title: "Prepare Presentation Slides",
+    description: "Create a 10-slide presentation summarizing your research findings. Include charts and visuals.",
+    deadline: "Apr 15, 2026",
+    urgency: "medium",
+    estimatedMinutes: 60,
+    started: false,
+    steps: [
+      "Outline slide structure and flow",
+      "Design title slide and agenda",
+      "Create content slides with key findings",
+      "Add charts and visual data representations",
+      "Rehearse the presentation once",
+    ],
+  },
+  {
+    id: "4",
+    title: "Submit Final Bibliography",
+    description: "Compile all sources used in the project into a formatted bibliography document.",
+    deadline: "Apr 18, 2026",
+    urgency: "low",
+    estimatedMinutes: 25,
+    started: false,
+    steps: [
+      "Gather all source materials",
+      "Format each entry in APA style",
+      "Alphabetize the list",
+      "Double-check for missing entries",
+    ],
+  },
+];
