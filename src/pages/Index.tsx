@@ -1,24 +1,67 @@
 import { useState } from "react";
 import { BookOpen, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import UploadZone from "@/components/UploadZone";
 import TaskCard from "@/components/TaskCard";
 import TaskTimeline from "@/components/TaskTimeline";
 import type { ExtractedTask } from "@/types/task";
-import { generateMockTasks } from "@/data/mockTasks";
+import { supabase } from "@/integrations/supabase/client";
+
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1]); // strip data:... prefix
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 
 const Index = () => {
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasUploaded, setHasUploaded] = useState(false);
 
-  const handleFileSelected = (_file: File) => {
+  const handleFileSelected = async (file: File) => {
     setIsProcessing(true);
-    // Simulate OCR + AI processing
-    setTimeout(() => {
-      setTasks(generateMockTasks());
-      setIsProcessing(false);
+    try {
+      const imageBase64 = await fileToBase64(file);
+
+      const { data, error } = await supabase.functions.invoke("extract-tasks", {
+        body: { imageBase64 },
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        toast.error(data.error);
+        setIsProcessing(false);
+        return;
+      }
+
+      const extractedTasks: ExtractedTask[] = (data.tasks || []).map(
+        (t: any, i: number) => ({
+          id: String(i + 1),
+          title: t.title,
+          description: t.description,
+          deadline: t.deadline,
+          urgency: t.urgency,
+          estimatedMinutes: t.estimatedMinutes,
+          steps: t.steps,
+          started: false,
+        })
+      );
+
+      setTasks(extractedTasks);
       setHasUploaded(true);
-    }, 2500);
+      toast.success(`Extracted ${extractedTasks.length} tasks from your assignment!`);
+    } catch (err: any) {
+      console.error("Extraction error:", err);
+      toast.error(err?.message || "Failed to analyze the image. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const handleStart = (id: string) => {
@@ -37,7 +80,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -60,7 +102,6 @@ const Index = () => {
       <main className="mx-auto max-w-5xl px-4 py-8">
         {!hasUploaded ? (
           <div className="animate-fade-in">
-            {/* Hero */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -81,15 +122,12 @@ const Index = () => {
           </div>
         ) : (
           <div className="animate-fade-in">
-            {/* Summary */}
             <div className="mb-6 flex flex-wrap items-center gap-4">
               <h2 className="text-xl font-bold text-foreground">
                 {tasks.length} tasks extracted
               </h2>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  ⏱ {totalMinutes} min total
-                </span>
+                <span className="flex items-center gap-1">⏱ {totalMinutes} min total</span>
                 {highCount > 0 && (
                   <span className="urgency-high text-xs font-semibold px-2 py-0.5 rounded-full">
                     {highCount} urgent
@@ -99,14 +137,11 @@ const Index = () => {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-              {/* Task cards */}
               <div className="space-y-4">
                 {tasks.map((task, i) => (
                   <TaskCard key={task.id} task={task} index={i} onStart={handleStart} />
                 ))}
               </div>
-
-              {/* Sidebar timeline */}
               <div className="lg:sticky lg:top-24 lg:self-start">
                 <TaskTimeline tasks={tasks} />
               </div>
