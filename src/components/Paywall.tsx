@@ -1,7 +1,7 @@
 import { Lock, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/YOUR_LINK_HERE";
+const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/test_9B600iaygcBJ1xFec87kc00";
 
 interface PaywallProps {
   onUnlocked?: boolean;
