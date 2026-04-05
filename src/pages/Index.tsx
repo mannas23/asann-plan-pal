@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import UploadZone from "@/components/UploadZone";
 import TaskCard from "@/components/TaskCard";
 import TaskTimeline from "@/components/TaskTimeline";
+import Paywall from "@/components/Paywall";
 import type { ExtractedTask } from "@/types/task";
 import { supabase } from "@/integrations/supabase/client";
+
+const FREE_UPLOAD_LIMIT = 3;
 
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
