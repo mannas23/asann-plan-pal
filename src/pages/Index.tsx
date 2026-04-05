@@ -125,7 +125,16 @@ const Index = () => {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
-        {!hasUploaded ? (
+        {isPaywalled ? (
+          <Paywall />
+        ) : isUnlocked && !hasUploaded ? (
+          <div className="animate-fade-in">
+            <Paywall onUnlocked />
+            <div className="mt-8 max-w-2xl mx-auto">
+              <UploadZone onFileSelected={handleFileSelected} isProcessing={isProcessing} />
+            </div>
+          </div>
+        ) : !hasUploaded ? (
           <div className="animate-fade-in">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
