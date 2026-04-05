@@ -39,7 +39,7 @@ const UploadZone = ({ onFileSelected, isProcessing }: UploadZoneProps) => {
     >
       <input
         type="file"
-        accept="image/*"
+        accept="image/*,.pdf,application/pdf"
         onChange={handleChange}
         className="absolute inset-0 opacity-0 cursor-pointer"
         disabled={isProcessing}
