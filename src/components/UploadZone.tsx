@@ -66,10 +66,10 @@ const UploadZone = ({ onFileSelected, isProcessing }: UploadZoneProps) => {
             </div>
             <div>
               <p className="text-lg font-semibold text-foreground">
-                Drop your assignment screenshot here
+                Drop your assignment here
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Supports images of assignments, syllabi & instructions
+                Supports images & PDFs of assignments, syllabi & instructions
               </p>
             </div>
             <span className="text-xs font-medium text-primary bg-primary/10 px-3 py-1.5 rounded-full">
