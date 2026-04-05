@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64 } = await req.json();
+    const { imageBase64, mimeType } = await req.json();
 
     if (!imageBase64 || typeof imageBase64 !== "string") {
       return new Response(
@@ -20,6 +20,8 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    const imageMime = mimeType || "image/png";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -57,7 +59,7 @@ Be thorough — extract every distinct deliverable or requirement as a separate 
               content: [
                 {
                   type: "image_url",
-                  image_url: { url: `data:image/png;base64,${imageBase64}` },
+                  image_url: { url: `data:${imageMime};base64,${imageBase64}` },
                 },
                 {
                   type: "text",
