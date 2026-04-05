@@ -51,7 +51,7 @@ const Index = () => {
       const imageBase64 = await fileToBase64(file);
 
       const { data, error } = await supabase.functions.invoke("extract-tasks", {
-        body: { imageBase64 },
+        body: { imageBase64, mimeType: file.type || "image/png" },
       });
 
       if (error) throw error;
