@@ -59,7 +59,7 @@ Be thorough — extract every distinct deliverable or requirement as a separate 
               content: [
                 {
                   type: "image_url",
-                  image_url: { url: `data:image/png;base64,${imageBase64}` },
+                  image_url: { url: `data:${imageMime};base64,${imageBase64}` },
                 },
                 {
                   type: "text",
