@@ -152,6 +152,11 @@ const Index = () => {
             </div>
             <div className="max-w-2xl mx-auto">
               <UploadZone onFileSelected={handleFileSelected} isProcessing={isProcessing} />
+              {!isUnlocked && (
+                <p className="text-center text-xs text-muted-foreground mt-3">
+                  {FREE_UPLOAD_LIMIT - uploadCount} free upload{FREE_UPLOAD_LIMIT - uploadCount !== 1 ? "s" : ""} remaining
+                </p>
+              )}
             </div>
           </div>
         ) : (
