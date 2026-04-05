@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BookOpen, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import UploadZone from "@/components/UploadZone";
 import TaskCard from "@/components/TaskCard";
 import TaskTimeline from "@/components/TaskTimeline";
+import Paywall from "@/components/Paywall";
 import type { ExtractedTask } from "@/types/task";
 import { supabase } from "@/integrations/supabase/client";
+
+const FREE_UPLOAD_LIMIT = 3;
 
 const fileToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -22,6 +25,25 @@ const Index = () => {
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasUploaded, setHasUploaded] = useState(false);
+  const [uploadCount, setUploadCount] = useState(() => {
+    return parseInt(localStorage.getItem("pma_upload_count") || "0", 10);
+  });
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return localStorage.getItem("pma_unlocked") === "true";
+  });
+
+  // Check for payment success via URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      localStorage.setItem("pma_unlocked", "true");
+      setIsUnlocked(true);
+      toast.success("Payment successful! Unlimited access unlocked.");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  const isPaywalled = !isUnlocked && uploadCount >= FREE_UPLOAD_LIMIT;
 
   const handleFileSelected = async (file: File) => {
     setIsProcessing(true);
@@ -55,6 +77,9 @@ const Index = () => {
 
       setTasks(extractedTasks);
       setHasUploaded(true);
+      const newCount = uploadCount + 1;
+      setUploadCount(newCount);
+      localStorage.setItem("pma_upload_count", String(newCount));
       toast.success(`Extracted ${extractedTasks.length} tasks from your assignment!`);
     } catch (err: any) {
       console.error("Extraction error:", err);
@@ -100,7 +125,16 @@ const Index = () => {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 py-8">
-        {!hasUploaded ? (
+        {isPaywalled ? (
+          <Paywall />
+        ) : isUnlocked && !hasUploaded ? (
+          <div className="animate-fade-in">
+            <Paywall onUnlocked />
+            <div className="mt-8 max-w-2xl mx-auto">
+              <UploadZone onFileSelected={handleFileSelected} isProcessing={isProcessing} />
+            </div>
+          </div>
+        ) : !hasUploaded ? (
           <div className="animate-fade-in">
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-4">
@@ -118,6 +152,11 @@ const Index = () => {
             </div>
             <div className="max-w-2xl mx-auto">
               <UploadZone onFileSelected={handleFileSelected} isProcessing={isProcessing} />
+              {!isUnlocked && (
+                <p className="text-center text-xs text-muted-foreground mt-3">
+                  {FREE_UPLOAD_LIMIT - uploadCount} free upload{FREE_UPLOAD_LIMIT - uploadCount !== 1 ? "s" : ""} remaining
+                </p>
+              )}
             </div>
           </div>
         ) : (
