@@ -77,6 +77,9 @@ const Index = () => {
 
       setTasks(extractedTasks);
       setHasUploaded(true);
+      const newCount = uploadCount + 1;
+      setUploadCount(newCount);
+      localStorage.setItem("pma_upload_count", String(newCount));
       toast.success(`Extracted ${extractedTasks.length} tasks from your assignment!`);
     } catch (err: any) {
       console.error("Extraction error:", err);
