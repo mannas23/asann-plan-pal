@@ -25,6 +25,25 @@ const Index = () => {
   const [tasks, setTasks] = useState<ExtractedTask[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [hasUploaded, setHasUploaded] = useState(false);
+  const [uploadCount, setUploadCount] = useState(() => {
+    return parseInt(localStorage.getItem("pma_upload_count") || "0", 10);
+  });
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return localStorage.getItem("pma_unlocked") === "true";
+  });
+
+  // Check for payment success via URL param
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      localStorage.setItem("pma_unlocked", "true");
+      setIsUnlocked(true);
+      toast.success("Payment successful! Unlimited access unlocked.");
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  const isPaywalled = !isUnlocked && uploadCount >= FREE_UPLOAD_LIMIT;
 
   const handleFileSelected = async (file: File) => {
     setIsProcessing(true);
